@@ -1,0 +1,7 @@
+services:
+  go-stress-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: go-stress-test
+    container_name: go-stress-test
