@@ -53,3 +53,6 @@ docker compose run --rm go-stress-test -url http://google.com -requests 137 -con
     "errors_count": 0
 }
 ```
+## 📝 Licença
+
+Este projeto está licenciado sob a Licença MIT. Veja o arquivo [LICENSE](./LICENSE) para mais detalhes.
