@@ -22,7 +22,6 @@ func main() {
 		MaxRequests: *maxRequests,
 		Concurrency: *concurrency,
 	}
-	requestFlag.Validate()
 
 	gateway := infra.NewRequestGateway()
 	mapper := infra.NewMapper()
@@ -30,9 +29,14 @@ func main() {
 
 	execResult, err := usecase.Execute(requestFlag)
 	if err != nil {
-		msgErr := fmt.Sprintf(`{"error": "%s"}`, err.Error())
-		fmt.Println(msgErr)
+		logErr(err)
+		return
 	}
 
 	fmt.Println(string(execResult))
+}
+
+func logErr(err error) {
+	msgErr := fmt.Sprintf(`{"error": "%s"}`, err.Error())
+	fmt.Println(msgErr)
 }

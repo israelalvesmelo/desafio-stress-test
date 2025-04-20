@@ -1,7 +1,7 @@
 package dto
 
 import (
-	"log"
+	"fmt"
 	"net/url"
 )
 
@@ -12,29 +12,30 @@ type RequestFlag struct {
 }
 
 const (
-	ErrURLIsRequired                    = "URL is required"
-	ErrMaxRequestsIsRequired            = "MaxRequests is required"
-	ErrConcurrencyIsRequired            = "Concurrency is required"
-	ErrMaxRequestsIsLessThanConcurrency = "Concurrency must be less than or equal to MaxRequests"
-	ErrInvalidURL                       = "Invalid URL"
+	ErrURLIsRequired                    = "flag -url is required"
+	ErrMaxRequestsIsRequired            = "flag -requests is required"
+	ErrConcurrencyIsRequired            = "flag -concurrency is required"
+	ErrMaxRequestsIsLessThanConcurrency = "flag -concurrency must be less than or equal to -requests"
+	ErrInvalidURL                       = "invalid -url"
 )
 
-func (r *RequestFlag) Validate() {
+func (r *RequestFlag) Validate() error {
 	if r.URL == "" {
-		log.Fatal(ErrURLIsRequired)
+		return fmt.Errorf(ErrURLIsRequired)
 	}
 	if r.MaxRequests <= 0 {
-		log.Fatal(ErrMaxRequestsIsRequired)
+		return fmt.Errorf(ErrMaxRequestsIsRequired)
 	}
 	if r.Concurrency <= 0 {
-		log.Fatal(ErrConcurrencyIsRequired)
+		return fmt.Errorf(ErrConcurrencyIsRequired)
 	}
 	if r.Concurrency > r.MaxRequests {
-		log.Fatal(ErrMaxRequestsIsLessThanConcurrency)
+		return fmt.Errorf(ErrMaxRequestsIsLessThanConcurrency)
 	}
 	if !r.isValidURL(r.URL) {
-		log.Fatal(ErrInvalidURL)
+		return fmt.Errorf(ErrInvalidURL)
 	}
+	return nil
 }
 
 func (r *RequestFlag) isValidURL(u string) bool {

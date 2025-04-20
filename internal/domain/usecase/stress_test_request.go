@@ -23,6 +23,11 @@ func NewStressTestRequest(rq infra.RequestGateway, mapper infra.Mapper) *StressT
 
 func (s *StressTestRequest) Execute(rf dto.RequestFlag) ([]byte, error) {
 	fmt.Println("Starting stress test...")
+
+	if err := rf.Validate(); err != nil {
+		return nil, err
+	}
+
 	startTime := time.Now()
 
 	var (
