@@ -35,27 +35,32 @@ func (s *StressTestRequest) Execute(rf dto.RequestFlag) ([]byte, error) {
 		Error:  errChan,
 	}
 
-	for i := 0; i < rf.MaxRequests; i++ {
-		for j := 0; j < rf.Concurrency; j++ {
-			go s.worker(rf.URL, c)
-		}
+	jobs := make(chan int, rf.MaxRequests)
+
+	for range rf.Concurrency {
+		go s.worker(rf.URL, c, jobs)
 	}
+
+	for i := range rf.MaxRequests {
+		jobs <- i
+	}
+	close(jobs)
 
 	response := s.processResponse(rf, startTime, &c)
 	fmt.Println("Stress test finished...")
 	return s.mapper.MarshalJSON(response)
 }
 
-func (s *StressTestRequest) worker(url string, c entity.Concurrency) {
-	go func() {
+func (s *StressTestRequest) worker(url string, c entity.Concurrency, jobs chan int) {
+	for range jobs {
 		s.requestGateway.SendRequest(url, c)
-	}()
+	}
 }
 
 func (s *StressTestRequest) processResponse(rf dto.RequestFlag, startTime time.Time, c *entity.Concurrency) *dto.Response {
 	response := entity.NewResponse(rf.Concurrency)
 
-	for i := 0; i < rf.MaxRequests; i++ {
+	for range rf.MaxRequests {
 		select {
 		case status := <-c.Status:
 			response.IncrementRequest()
